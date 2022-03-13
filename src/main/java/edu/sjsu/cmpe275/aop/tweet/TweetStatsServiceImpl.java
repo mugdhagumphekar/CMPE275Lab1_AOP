@@ -10,6 +10,8 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public Map<UUID, HashSet<String>> likes = new HashMap<>();     //tweet UUID to likes map
 	public Map<UUID, HashSet<UUID>> replies = new HashMap<>();   //message to replies map
 	public Map<String, HashSet<String>> blockedUsers = new HashMap<>();  //user to list of blocked users map
+	Map<UUID, Integer> messageThreads = new HashMap<>(); //stores last reply in thread to thread length map
+	Map<UUID, Integer> visitedTweets = new HashMap<>();  //marks the visited replies while calculating the longest thread
 
 	@Override
 	public void resetStatsAndSystem() {
@@ -186,6 +188,51 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 
 	@Override
 	public UUID getLongestMessageThread() {
+		if(!this.replies.isEmpty()){
+			for(Map.Entry<UUID, HashSet<UUID>> tweet : this.replies.entrySet()){
+				this.visitedTweets.put(tweet.getKey(), 1);
+				searchLongestThread(1, tweet.getKey());
+			}
+
+			Integer longestThreadLen = new Integer(0);
+			UUID lastReply = new UUID(0, 0);
+
+			for(Map.Entry<UUID, Integer> thread : this.messageThreads.entrySet()){
+				if(thread.getValue() > longestThreadLen){
+					longestThreadLen = thread.getValue();
+					lastReply = thread.getKey();
+				}
+
+				else if(thread.getValue() == longestThreadLen){
+					lastReply = thread.getKey().compareTo(lastReply) < 0 ? thread.getKey() : lastReply;
+				}
+			}
+
+			return lastReply;
+		}
+
+		return null;
+	}
+
+	Map searchLongestThread(int currentThreadLen, UUID currentReply){
+		if(this.replies.containsKey(currentReply)){
+			this.visitedTweets.put(currentReply, 1);
+
+			for(UUID reply : this.replies.get(currentReply)){
+				if(!this.visitedTweets.containsKey(reply)){
+					this.visitedTweets.put(reply, 1);
+					Map thread = searchLongestThread(currentThreadLen+1, reply);
+					Map.Entry<UUID, Integer> threadKV = (Map.Entry<UUID, Integer>) thread.entrySet();
+					this.messageThreads.put(threadKV.getKey(), threadKV.getValue());
+				}
+			}
+		}
+
+		else{
+			Map<UUID, Integer> threadDetails = new HashMap<>();
+			threadDetails.put(currentReply, new Integer(currentThreadLen));
+			return threadDetails;
+		}
 
 		return null;
 	}
