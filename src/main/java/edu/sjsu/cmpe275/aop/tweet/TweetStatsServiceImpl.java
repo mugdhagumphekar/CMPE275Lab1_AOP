@@ -101,13 +101,49 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	
 	@Override
 	public String getMostProductiveReplier() {
-		// TODO Auto-generated method stub
+		int highestCharCount = 0;
+		String replier = "";
+
+		if(!this.replies.isEmpty()){
+			for(Map.Entry<UUID, HashSet<UUID>> reply : this.replies.entrySet()){
+				for(UUID replyID : reply.getValue()){
+					if(this.tweets.containsKey(replyID) && this.tweets.get(replyID).length() > highestCharCount){
+						highestCharCount = this.tweets.get(replyID).split(":")[1].length();
+						replier = this.tweets.get(replyID).split(":")[0];
+					}
+
+					else if(this.tweets.containsKey(replyID) && this.tweets.get(replyID).length() == highestCharCount){
+						String currentReplier = this.tweets.get(replyID).split(":")[0];
+						replier = currentReplier.compareTo(replier) < 0 ? currentReplier : replier;
+					}
+				}
+			}
+
+			return replier;
+		}
+
 		return null;
 	}
 
 	@Override
 	public UUID getMostLikedMessage() {
-		// TODO Auto-generated method stub
+		UUID mostLikedMessage = new UUID(0,0);
+		int numOfLikes = 0;
+
+		if(!this.likes.isEmpty()){
+			for(Map.Entry<UUID, HashSet<String>> entry : this.likes.entrySet()){
+				if(entry.getValue().size() > numOfLikes){
+					mostLikedMessage = entry.getKey();
+					numOfLikes = entry.getValue().size();
+				}
+
+				else if(entry.getValue().size() == numOfLikes){
+					mostLikedMessage = entry.getKey().compareTo(mostLikedMessage) < 0 ? entry.getKey() : mostLikedMessage;
+				}
+			}
+
+			return mostLikedMessage;
+		}
 		return null;
 	}
 
@@ -150,7 +186,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 
 	@Override
 	public UUID getLongestMessageThread() {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
