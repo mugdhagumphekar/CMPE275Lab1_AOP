@@ -85,11 +85,9 @@ public class StatsAspect {
             System.out.println("This tweet is visible to: " + stats.tweetVisibility.get(tweetID));
 
             if(stats.blockedUsers.containsKey(user) && stats.tweetVisibility.containsKey(tweetID)){
-                for (String visibileTo : stats.tweetVisibility.get(tweetID)) {
-                    HashSet<String> users = stats.tweetVisibility.get(tweetID);
-
+                HashSet<String> users = stats.tweetVisibility.get(tweetID);
+                for (String visibileTo : users) {
                     if (stats.blockedUsers.get(user).contains(visibileTo)) {
-
 
                         users.remove(visibileTo);
                         System.out.println("new visibility after blocking = " + stats.tweetVisibility.get(tweetID));
