@@ -23,22 +23,22 @@ public class AccessControlAspect {
 	@Autowired
 	TweetStatsServiceImpl stats;
 
-	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.block(..))")
-	public void blockUser(JoinPoint joinPoint){
-		String user = (String)joinPoint.getArgs()[0];
-		String follower = (String)joinPoint.getArgs()[1];
-
-		if(stats.blockedUsers.containsKey(user)){
-			stats.blockedUsers.get(user).add(follower);
-		}
-
-		else{
-			HashSet<String> blockedUser = new HashSet<>();
-			blockedUser.add(follower);
-			stats.blockedUsers.put(user, blockedUser);
-		}
-		System.out.println("after blocking: " + stats.blockedUsers.get(user) + " & followers = " + stats.followers.get(user));
-	}
+//	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.block(..))")
+//	public void blockUser(JoinPoint joinPoint){
+//		String user = (String)joinPoint.getArgs()[0];
+//		String follower = (String)joinPoint.getArgs()[1];
+//
+//		if(stats.blockedUsers.containsKey(user)){
+//			stats.blockedUsers.get(user).add(follower);
+//		}
+//
+//		else{
+//			HashSet<String> blockedUser = new HashSet<>();
+//			blockedUser.add(follower);
+//			stats.blockedUsers.put(user, blockedUser);
+//		}
+//		System.out.println("after blocking: " + stats.blockedUsers.get(user) + " & followers = " + stats.followers.get(user));
+//	}
 
 	@Before("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.like(..))")
 	public void checkLikePossible(JoinPoint joinPoint) throws AccessControlException {
@@ -55,56 +55,60 @@ public class AccessControlAspect {
 			throw new AccessControlException("User cannot like his own message");
 		}
 
-		if(stats.followers.get(tweeter).contains(user)){
-			if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
-				throw new AccessControlException("The user cannot like this message.");
-			}
+//		if(stats.followers.get(tweeter).contains(user)){
+//			if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
+//				throw new AccessControlException("The user cannot like this message.");
+//			}
 
-			if(stats.likes.containsKey(message) && stats.likes.get(message).contains(user)){
-				throw new AccessControlException("User has already liked this message");
-			}
+		if(stats.likes.containsKey(message) && stats.likes.get(message).contains(user)){
+			throw new AccessControlException("User has already liked this message");
 		}
 
-		else if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
-			throw new AccessControlException("The user cannot like this message.");
+		if(stats.tweetVisibility.containsKey(message) && !stats.tweetVisibility.get(message).contains(user)){
+			throw new AccessControlException("This message is not accessible to the user");
 		}
+		//}
+
+//		else if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
+//			throw new AccessControlException("The user cannot like this message.");
+//		}
 	}
 
-	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.like(..))")
-	public void likeMessage(JoinPoint joinPoint) throws AccessControlException {
-		String user = (String)joinPoint.getArgs()[0];
-		UUID message = (UUID)joinPoint.getArgs()[1];
+//	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.like(..))")
+//	public void likeMessage(JoinPoint joinPoint) throws AccessControlException {
+//		String user = (String)joinPoint.getArgs()[0];
+//		UUID message = (UUID)joinPoint.getArgs()[1];
+//
+//		if(stats.likes.containsKey(message) && !stats.likes.get(message).contains(user)){
+//			stats.likes.get(message).add(user);
+//		}
+//
+//		else{
+//			HashSet<String> likes = new HashSet<>();
+//			likes.add(user);
+//			stats.likes.put(message, likes);
+//		}
+//	}
 
-		if(stats.likes.containsKey(message) && !stats.likes.get(message).contains(user)){
-			stats.likes.get(message).add(user);
-		}
-
-		else{
-			HashSet<String> likes = new HashSet<>();
-			likes.add(user);
-			stats.likes.put(message, likes);
-		}
-	}
-
-	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.follow(..))")
-	public void followUser(JoinPoint joinPoint){
-		String user = (String)joinPoint.getArgs()[1];
-		String follower = (String)joinPoint.getArgs()[0];
-
-		if(stats.followers.containsKey(user)){
-			System.out.println("appending to followers");
-			stats.followers.get(user).add(follower);
-		}
-
-		else{
-			System.out.println("creating followers");
-			HashSet<String> followers = new HashSet<>();
-			followers.add(follower);
-			System.out.println("adding " + follower + " to followers of "+user);
-			stats.followers.put(user, followers);
-		}
-
-	}
+//	@After("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.follow(..))")
+//	public void followUser(JoinPoint joinPoint){
+//		String user = (String)joinPoint.getArgs()[1];
+//		String follower = (String)joinPoint.getArgs()[0];
+//
+//		if(stats.followers.containsKey(user)){
+//			System.out.println("appending to followers");
+//			stats.followers.get(user).add(follower);
+//		}
+//
+//		else{
+//			System.out.println("creating followers");
+//			HashSet<String> followers = new HashSet<>();
+//			followers.add(follower);
+//			System.out.println("adding " + follower + " to followers of "+user);
+//			stats.followers.put(user, followers);
+//		}
+//
+//	}
 
 	@Before("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.reply(..))")
 	public void checkReplyPossible(JoinPoint joinPoint){

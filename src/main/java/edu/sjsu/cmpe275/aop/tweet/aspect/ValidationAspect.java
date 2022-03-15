@@ -24,15 +24,15 @@ public class ValidationAspect {
 		String user = (String) joinPoint.getArgs()[0];
 		String tweet = (String) joinPoint.getArgs()[1];
 
-		if (tweet.length() > 140) {
-			throw new IllegalArgumentException("Tweet length cannot be longer than 140 characters");
-		}
-
 		if (tweet == null || tweet.length() == 0) {
 			throw new IllegalArgumentException("Invalid tweet entered");
 		}
 
-		if (user.length() == 0 || user == null) {
+		if (tweet.length() > 140) {
+			throw new IllegalArgumentException("Tweet length cannot be longer than 140 characters");
+		}
+
+		if (user == null || user.length() == 0) {
 			throw new IllegalArgumentException("Invalid user name entered");
 		}
 	}
@@ -104,11 +104,11 @@ public class ValidationAspect {
 		String user = (String) joinPoint.getArgs()[0];
 		UUID message = (UUID) joinPoint.getArgs()[1];
 
-		if(user ==null||user.length() ==0) {
+		if(user == null || user.length() == 0) {
 			throw new IllegalArgumentException("User name cannot be empty");
 		}
 
-		if(message ==null||message.toString().length() == 0) {
+		if(message == null || message.toString().length() == 0) {
 			throw new IllegalArgumentException("Invalid message ID");
 		}
 	}
@@ -125,15 +125,15 @@ public class ValidationAspect {
 
 		String tweeter = stats.tweets.get(message).split(":")[0];
 
-		if(user ==null||user.length() ==0) {
+		if(user == null || user.length() == 0) {
 			throw new IllegalArgumentException("User name cannot be empty");
 		}
 
-		if(reply ==null||reply.length() ==0) {
+		if(reply == null || reply.length() == 0) {
 			throw new IllegalArgumentException("Reply cannot be empty");
 		}
 
-		if(message ==null||message.toString().length() == 0) {
+		if(message == null || message.toString().length() == 0) {
 			throw new IllegalArgumentException("Invalid message ID");
 		}
 
