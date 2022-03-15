@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 
 import java.security.AccessControlException;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Aspect
-@Order(0)
+@Order(2)
 public class AccessControlAspect {
 	@Autowired
 	TweetStatsServiceImpl stats;
@@ -36,29 +37,35 @@ public class AccessControlAspect {
 			blockedUser.add(follower);
 			stats.blockedUsers.put(user, blockedUser);
 		}
+		System.out.println("after blocking: " + stats.blockedUsers.get(user) + " & followers = " + stats.followers.get(user));
 	}
 
 	@Before("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.like(..))")
 	public void checkLikePossible(JoinPoint joinPoint) throws AccessControlException {
 		String user = (String)joinPoint.getArgs()[0];
 		UUID message = (UUID)joinPoint.getArgs()[1];
-		String tweeter = stats.tweets.get(message).split(":")[0];
 
 		if(!stats.tweets.containsKey(message)){
 			throw new AccessControlException("This message does not exist");
 		}
 
+		String tweeter = stats.tweets.get(message).split(":")[0];
+
 		if(user.compareTo(tweeter) == 0){
 			throw new AccessControlException("User cannot like his own message");
 		}
 
-		if(stats.followers.get(tweeter).contains(user) && !stats.blockedUsers.get(tweeter).contains(user)){
+		if(stats.followers.get(tweeter).contains(user)){
+			if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
+				throw new AccessControlException("The user cannot like this message.");
+			}
+
 			if(stats.likes.containsKey(message) && stats.likes.get(message).contains(user)){
 				throw new AccessControlException("User has already liked this message");
 			}
 		}
 
-		else{
+		else if(stats.blockedUsers.containsKey(tweeter) && stats.blockedUsers.get(tweeter).contains(user)){
 			throw new AccessControlException("The user cannot like this message.");
 		}
 	}
@@ -85,13 +92,16 @@ public class AccessControlAspect {
 		String follower = (String)joinPoint.getArgs()[0];
 
 		if(stats.followers.containsKey(user)){
+			System.out.println("appending to followers");
 			stats.followers.get(user).add(follower);
 		}
 
 		else{
+			System.out.println("creating followers");
 			HashSet<String> followers = new HashSet<>();
 			followers.add(follower);
-			stats.blockedUsers.put(user, followers);
+			System.out.println("adding " + follower + " to followers of "+user);
+			stats.followers.put(user, followers);
 		}
 
 	}
@@ -101,6 +111,11 @@ public class AccessControlAspect {
 		String user = (String) joinPoint.getArgs()[0];
 		UUID message = (UUID) joinPoint.getArgs()[1];
 		String reply = (String) joinPoint.getArgs()[2];
+
+		if(!stats.tweets.containsKey(message)){
+			throw new AccessControlException("This message does not exist");
+		}
+
 		String tweeter = stats.tweets.get(message).split(":")[0];
 
 		if(stats.blockedUsers.containsKey(user) && stats.blockedUsers.get(user).contains(tweeter)){
@@ -108,7 +123,7 @@ public class AccessControlAspect {
 		}
 
 		else{
-			if(!stats.tweetVisibility.get(message).contains(user)){
+			if(stats.tweetVisibility.containsKey(message) && !stats.tweetVisibility.get(message).contains(user)){
 				throw new AccessControlException("This tweet is not accessible to the user");
 			}
 		}

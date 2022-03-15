@@ -5,28 +5,28 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.aspectj.lang.annotation.Around;
 
-@Aspect
-@Order(1)
-public class RetryAspect {
-    /***
-     * Following is a dummy implementation of this aspect.
-     * You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
-     * @throws Throwable 
-     */
+import java.io.IOException;
+import java.util.UUID;
 
-	@Around("execution(public int edu.sjsu.cmpe275.aop.tweet.TweetService.*tweet(..))")
-	public int dummyAdviceOne(ProceedingJoinPoint joinPoint) throws Throwable {
-		System.out.printf("Prior to the executuion of the metohd %s\n", joinPoint.getSignature().getName());
-		Integer result = null;
-		try {
-			result = (Integer) joinPoint.proceed();
-			System.out.printf("Finished the executuion of the metohd %s with result %s\n", joinPoint.getSignature().getName(), result);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			System.out.printf("Aborted the executuion of the metohd %s\n", joinPoint.getSignature().getName());
-			throw e;
+@Aspect
+@Order(0)
+public class RetryAspect {
+
+	@Around("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetService.*(..))")
+	public UUID retryAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
+		UUID result = null;
+		for(int i = 0; i < 4; i++){
+			try{
+				result = (UUID)joinPoint.proceed();
+				break;
+			} catch(IOException ioException){
+				if(i == 3){
+					throw new IOException("Method execution failed after trying 4 times");
+				}
+			}
+
 		}
-		return result.intValue();
+		return result;
 	}
 
 }

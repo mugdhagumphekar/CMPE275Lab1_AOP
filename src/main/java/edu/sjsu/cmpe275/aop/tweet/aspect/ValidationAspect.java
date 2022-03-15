@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 @Aspect
-@Order(3)
+@Order(1)
 public class ValidationAspect {
 	@Autowired
 	TweetStatsServiceImpl stats;
@@ -42,15 +42,22 @@ public class ValidationAspect {
 		String tweet = (String) joinPoint.getArgs()[1];
 		String user = (String) joinPoint.getArgs()[0];
 		stats.tweets.put(tweetID, user + ":" + tweet);
-		//System.out.println(stats.tweets.get(tweetID));
+		System.out.println("tweetid = " + tweetID);
+		System.out.println("**************");
+		System.out.println("tweet put in hashmap- " + stats.tweets.get(tweetID));
 
 		if (stats.followers.containsKey(user)) {
-			stats.tweetVisibility.put(tweetID, stats.followers.get(user));
+			stats.tweetVisibility.put(tweetID, (HashSet<String>) stats.followers.get(user).clone());
+			System.out.println("the user's followers are: " + stats.followers.get(user));
+			System.out.println("This tweet is visible to: " + stats.tweetVisibility.get(tweetID));
 
-			for (String visibileTo : stats.tweetVisibility.get(tweetID)) {
-				if (stats.blockedUsers.get(user).contains(visibileTo)) {
-					stats.tweetVisibility.get(tweetID).remove(visibileTo);
-					System.out.println(stats.tweetVisibility.get(tweetID));
+			if(stats.blockedUsers.containsKey(user) && stats.tweetVisibility.containsKey(tweetID)){
+				for (String visibileTo : stats.tweetVisibility.get(tweetID)) {
+					if (stats.blockedUsers.get(user).contains(visibileTo)) {
+						stats.tweetVisibility.get(tweetID).remove(visibileTo);
+						System.out.println("new visibility after blocking = " + stats.tweetVisibility.get(tweetID));
+						System.out.println("followers = " + stats.followers.get(user));
+					}
 				}
 			}
 
@@ -111,6 +118,11 @@ public class ValidationAspect {
 		String user = (String) joinPoint.getArgs()[0];
 		UUID message = (UUID) joinPoint.getArgs()[1];
 		String reply = (String) joinPoint.getArgs()[2];
+
+		if(!stats.tweets.containsKey(message)){
+			throw new IllegalArgumentException("This message does not exist");
+		}
+
 		String tweeter = stats.tweets.get(message).split(":")[0];
 
 		if(user ==null||user.length() ==0) {
@@ -123,10 +135,6 @@ public class ValidationAspect {
 
 		if(message ==null||message.toString().length() == 0) {
 			throw new IllegalArgumentException("Invalid message ID");
-		}
-
-		if(!stats.tweets.containsKey(message)){
-			throw new IllegalArgumentException("This message does not exist");
 		}
 
 		if(user.compareTo(tweeter) == 0){
@@ -148,9 +156,16 @@ public class ValidationAspect {
 		stats.tweets.put(tweetID, user + ":" + reply);
 		//System.out.println(stats.tweets.get(tweetID));
 
+		if(stats.followers.containsKey(user)){
+			stats.tweetVisibility.put(tweetID, (HashSet<String>) stats.followers.get(user).clone());
+			stats.tweetVisibility.get(tweetID).add(tweeter);
+		}
 
-		stats.tweetVisibility.put(tweetID, stats.followers.get(user));
-		stats.tweetVisibility.get(tweetID).add(tweeter);
+		else{
+			HashSet<String> visibility = new HashSet<>();
+			visibility.add(tweeter);
+			stats.tweetVisibility.put(tweetID, visibility);
+		}
 
 		if(stats.replies.containsKey(originalMessageID)){
 			stats.replies.get(originalMessageID).add(tweetID);
@@ -162,19 +177,13 @@ public class ValidationAspect {
 			stats.replies.put(originalMessageID, replies);
 		}
 
-		for (String visibileTo : stats.tweetVisibility.get(tweetID)) {
-			if (stats.blockedUsers.get(user).contains(visibileTo)) {
-				stats.tweetVisibility.get(tweetID).remove(visibileTo);
-				System.out.println(stats.tweetVisibility.get(tweetID));
+		if(stats.blockedUsers.containsKey(user)){
+			for (String visibileTo : stats.tweetVisibility.get(tweetID)) {
+				if (stats.blockedUsers.get(user).contains(visibileTo)) {
+					stats.tweetVisibility.get(tweetID).remove(visibileTo);
+					System.out.println(stats.tweetVisibility.get(tweetID));
+				}
 			}
 		}
 	}
-
-
-
-
-
-
-
-	
 }

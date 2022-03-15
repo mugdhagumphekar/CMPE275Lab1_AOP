@@ -8,7 +8,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public Map<UUID, String> tweets = new HashMap<>();   //UUID to tweet content map (tweet will be user:tweetcontent)
 	public Map<UUID, HashSet<String>> tweetVisibility = new HashMap<>(); //tweet UUID to users shared with map
 	public Map<UUID, HashSet<String>> likes = new HashMap<>();     //tweet UUID to likes map
-	public Map<UUID, HashSet<UUID>> replies = new HashMap<>();   //message to replies map
+	public Map<UUID, HashSet<UUID>> replies = new LinkedHashMap<>();   //message to replies map
 	public Map<String, HashSet<String>> blockedUsers = new HashMap<>();  //user to list of blocked users map
 	Map<UUID, Integer> messageThreads = new HashMap<>(); //stores last reply in thread to thread length map
 	Map<UUID, Integer> visitedTweets = new HashMap<>();  //marks the visited replies while calculating the longest thread
@@ -44,22 +44,30 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 
 	@Override
 	public String getMostFollowedUser() {
-		String mostFollowed = "";
+		StringBuilder mostFollowed = new StringBuilder();
 		int numOfFollowers = 0;
 
 		if(!this.followers.isEmpty()){
+			System.out.println("Some users have followers");
+			System.out.println("followers map: " + this.followers);
 			for(Map.Entry<String, HashSet<String>> entry : this.followers.entrySet()){
+				System.out.println("Entry: " + entry.getKey() + " " + entry.getValue().size());
 				if(entry.getValue().size() > numOfFollowers){
-					mostFollowed = entry.getKey();
+					mostFollowed.replace(0, mostFollowed.length(), entry.getKey());
 					numOfFollowers = entry.getValue().size();
+					System.out.println("most followed is now " + mostFollowed);
 				}
 
 				else if(entry.getValue().size() == numOfFollowers){
-					mostFollowed = entry.getKey().compareTo(mostFollowed) < 0 ? entry.getKey() : mostFollowed;
+					if(entry.getKey().compareTo(mostFollowed.toString()) < 0){
+						mostFollowed.replace(0, mostFollowed.length(), entry.getKey());
+					}
+					System.out.println("There was a tie and most followed is now " + mostFollowed);
 				}
 			}
 
-			return mostFollowed;
+			System.out.println("Most followed is finally " + mostFollowed);
+			return mostFollowed.toString();
 		}
 
 		return null;
@@ -188,8 +196,10 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 
 	@Override
 	public UUID getLongestMessageThread() {
+		System.out.println("******Starting longest thread*******");
 		if(!this.replies.isEmpty()){
 			for(Map.Entry<UUID, HashSet<UUID>> tweet : this.replies.entrySet()){
+				//System.out.println(this.tweets.get(tweet.getKey()));
 				this.visitedTweets.put(tweet.getKey(), 1);
 				searchLongestThread(1, tweet.getKey());
 			}
@@ -198,6 +208,8 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			UUID lastReply = new UUID(0, 0);
 
 			for(Map.Entry<UUID, Integer> thread : this.messageThreads.entrySet()){
+				System.out.println("thread last msg: " + this.tweets.get(thread.getKey()));
+				System.out.println("thread len = " + thread.getValue());
 				if(thread.getValue() > longestThreadLen){
 					longestThreadLen = thread.getValue();
 					lastReply = thread.getKey();
@@ -214,23 +226,30 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 		return null;
 	}
 
-	Map searchLongestThread(int currentThreadLen, UUID currentReply){
+	HashMap searchLongestThread(int currentThreadLen, UUID currentReply){
+		System.out.println("next msg in thread: " + this.tweets.get(currentReply));
 		if(this.replies.containsKey(currentReply)){
 			this.visitedTweets.put(currentReply, 1);
 
 			for(UUID reply : this.replies.get(currentReply)){
 				if(!this.visitedTweets.containsKey(reply)){
 					this.visitedTweets.put(reply, 1);
-					Map thread = searchLongestThread(currentThreadLen+1, reply);
-					Map.Entry<UUID, Integer> threadKV = (Map.Entry<UUID, Integer>) thread.entrySet();
-					this.messageThreads.put(threadKV.getKey(), threadKV.getValue());
+					HashMap thread = searchLongestThread(currentThreadLen+1, reply);
+					if(thread!=null){
+						Map.Entry<UUID,Integer> entry = (Map.Entry<UUID, Integer>) thread.entrySet().iterator().next();
+						UUID lastReply = entry.getKey();
+						Integer numOfMessages = entry.getValue();
+						this.messageThreads.put(lastReply, numOfMessages);
+					}
 				}
 			}
 		}
 
 		else{
-			Map<UUID, Integer> threadDetails = new HashMap<>();
+			HashMap<UUID, Integer> threadDetails = new HashMap<>();
+			System.out.println("creating hashmap: " + currentReply + " " + currentThreadLen);
 			threadDetails.put(currentReply, new Integer(currentThreadLen));
+			System.out.println(threadDetails.get(currentReply));
 			return threadDetails;
 		}
 

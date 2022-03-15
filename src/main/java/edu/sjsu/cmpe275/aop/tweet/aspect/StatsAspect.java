@@ -13,20 +13,14 @@ import edu.sjsu.cmpe275.aop.tweet.TweetStatsServiceImpl;
 import java.io.IOException;
 
 @Aspect
-@Order(2)
+@Order(3)
 public class StatsAspect {
-	@Autowired TweetStatsServiceImpl stats;
+//	@Autowired TweetStatsServiceImpl stats;
 
-	@Before("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetStatsService.getLengthOfLongestTweet(..))")
-	public void checkTweetsExist(JoinPoint joinPoint) throws IOException {
-		if(stats.tweets == null){
-			throw new IOException("Tweets do not exist");
-		}
-	}
-
-
-
-
-
-	
+//	@Before("execution(public * edu.sjsu.cmpe275.aop.tweet.TweetStatsService.getLengthOfLongestTweet(..))")
+//	public void checkTweetsExist(JoinPoint joinPoint) throws IOException {
+//		if(stats.tweets == null){
+//			throw new IOException("Tweets do not exist");
+//		}
+//	}
 }
