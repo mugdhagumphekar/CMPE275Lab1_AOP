@@ -148,12 +148,12 @@ public class App {
 //			System.out.println("In the end");
 
 
-			tweeter.follow("bob", "alice");
-			tweeter.follow("divyaraj", "raj");
-			tweeter.follow("bob", "raj");
-			tweeter.follow("raj", "bob");
-			tweeter.follow("dummy", "raj");
-			tweeter.follow("dummy1", "raj");
+//			tweeter.follow("bob", "alice");
+//			tweeter.follow("divyaraj", "raj");
+//			tweeter.follow("bob", "raj");
+//			tweeter.follow("raj", "bob");
+//			tweeter.follow("dummy", "raj");
+//			tweeter.follow("dummy1", "raj");
 
 			// should throw IllegalArgumentException
 //	            tweeter.follow("", "raj");
@@ -168,21 +168,144 @@ public class App {
 			//should throw exception or not?
 			//UUID reply_third = tweeter.reply("raj", reply_reply2, "sending reply to old message sent before blocking");
 
+//			tweeter.follow("bob", "alice");
+//			tweeter.follow("james", "alice");
+//			//tweeter.follow("james", "alice");
+//			//tweeter.block("alice", "james");
+//			UUID msg =tweeter.tweet("alice", "Hi");
+//			//tweeter.follow("james", "bob");
+//			UUID reply1= tweeter.reply("bob", msg, "Hello ALice");
+//			UUID reply2 = tweeter.reply("alice", reply1, "How are you doing?");
+//			tweeter.block("alice", "bob");
+//			UUID reply3 = tweeter.reply("alice", reply1, "After alice blocked Bob. hahaha");
+//			tweeter.like("bob", msg);
+//			UUID reply4 = tweeter.reply("bob", reply2, "no comments!");
+//			//UUID reply5 = tweeter.reply("bob", reply3, "this message shouldn't reach!");
+//			UUID reply5 = tweeter.reply("bob",msg,"First Messag Commebt");
+			//UUID reply6 = tweeter.reply("alice", reply5, "Testing");
+
+//			tweeter.follow("bob", "alice");
+//			tweeter.follow("divyaraj", "raj");
+//			tweeter.follow("bob", "raj");
+//			tweeter.follow("dummy", "raj");
+//			tweeter.follow("dummy1", "raj");
+//
+//			UUID msg1 = tweeter.tweet("alice", "first tweet");
+//			UUID msg2 = tweeter.tweet("alice", "second tweet");
+//
+//			tweeter.block("raj", "bob");
+//			UUID msg3 = tweeter.tweet("raj", "third tweet hello world");
+//
+//			UUID msg4 = tweeter.tweet("divyaraj", "divyaraj tweet hello world");
+//			UUID msg5 = tweeter.tweet("bob", "bob tweets hello world!!");
+//
+//			// should through exception
+//            //UUID reply_msg1 = tweeter.reply("bob", msg3, "reply tweet");
+//
+//			UUID reply_msg2 = tweeter.reply("divyaraj", msg3, "reply tweet1");
+//			UUID reply_msg3 = tweeter.reply("divyaraj", msg3, "reply tweet2");
+//			UUID reply_msg4 = tweeter.reply("dummy", msg3, "reply tweet3");
+//
+//			// should through exception
+//            //UUID reply_msg5 = tweeter.reply("dummy2", msg3, "reply tweet3");
+//			tweeter.follow("dummy2", "raj");
+//			tweeter.follow("dummy2", "alice");
+//			tweeter.follow("dummy2", "divyaraj");
+//
+//			tweeter.block("raj","alice");
+//			tweeter.follow("alice","raj");
+//
+//			UUID msg6 = tweeter.tweet("raj", "Raj Fourth tweet hello world");
+//			// should throw Exception
+//            //UUID reply_msg6 = tweeter.reply("alice", msg6, "reply tweet3");
+//			// should throw Exception - name cannot be null
+//            //tweeter.block("","raj");
+//
+//
+//			tweeter.like("divyaraj",msg3);
+//			tweeter.like("dummy1",msg3);
+//			tweeter.like("dummy",msg3);
+//			tweeter.like("raj",reply_msg2);
+//			// should throw exception
+////            tweeter.like("divyaraj",reply_msg2);
+//
+//			//should throw exception
+////            tweeter.like("raj", msg3);
+////            tweeter.like("dummy3",msg3);
+
+//			tweeter.follow("x", "alice");
+//			tweeter.follow("y", "x");
+//			tweeter.follow("z", "y");
+//
+//			tweeter.follow("a", "bob");
+//			tweeter.follow("b", "a");
+//			tweeter.follow("c", "b");
+//
+//			UUID t1 = tweeter.tweet("alice", "alice hi");
+//			UUID ra1 = tweeter.reply("x", t1, "reply of x on t1");
+//			UUID ra2 = tweeter.reply("y", ra1, "reply of x on t1");
+//			UUID ra3 = tweeter.reply("z", ra2, "reply of x on t1");
+//
+//
+//			UUID t2 = tweeter.tweet("bob", "bob hi");
+//			UUID rb1 = tweeter.reply("a", t2, "reply of x on t1");
+//			UUID rb2 = tweeter.reply("b", rb1, "reply of x on t1");
+
+
+//			System.out.println(ra3+" @@@@@@@@@@@@@@@@@@");
+
+
+
 			tweeter.follow("bob", "alice");
-			tweeter.follow("james", "alice");
-			//tweeter.follow("james", "alice");
-			//tweeter.block("alice", "james");
-			UUID msg =tweeter.tweet("alice", "Hi");
-			//tweeter.follow("james", "bob");
-			UUID reply1= tweeter.reply("bob", msg, "Hello ALice");
-			UUID reply2 = tweeter.reply("alice", reply1, "How are you doing?");
-			tweeter.block("alice", "bob");
-			UUID reply3 = tweeter.reply("alice", reply1, "After alice blocked Bob. hahaha");
-			tweeter.like("bob", msg);
-			UUID reply4 = tweeter.reply("bob", reply2, "no comments!");
-			//UUID reply5 = tweeter.reply("bob", reply3, "this message shouldn't reach!");
-			UUID reply5 = tweeter.reply("bob",msg,"First Messag Commebt");
-			UUID reply6 = tweeter.reply("alice", reply5, "Testing");
+			tweeter.follow("divyaraj", "raj");
+			tweeter.follow("bob", "raj");
+			tweeter.follow("dummy", "raj");
+			tweeter.follow("dummy1", "raj");
+
+			// should throw IllegalArgumentException
+//            tweeter.follow("", "raj");
+
+			UUID msg1 = tweeter.tweet("alice", "first tweet");
+			UUID msg2 = tweeter.tweet("alice", "second tweet");
+
+			tweeter.block("raj", "bob");
+			UUID msg3 = tweeter.tweet("raj", "third tweet hello world");
+
+			UUID msg4 = tweeter.tweet("divyaraj", "divyaraj tweet hello world");
+			UUID msg5 = tweeter.tweet("bob", "bob tweets hello world!!");
+
+			// should through exception
+//            UUID reply_msg1 = tweeter.reply("bob", msg3, "reply tweet");
+
+			UUID reply_msg2 = tweeter.reply("divyaraj", msg3, "reply tweet1");
+			UUID reply_msg3 = tweeter.reply("divyaraj", msg3, "reply tweet2");
+			UUID reply_msg4 = tweeter.reply("dummy", msg3, "reply tweet3");
+
+			// should through exception
+//            UUID reply_msg5 = tweeter.reply("dummy2", msg3, "reply tweet3");
+			tweeter.follow("dummy2", "raj");
+			tweeter.follow("dummy2", "alice");
+			tweeter.follow("dummy2", "divyaraj");
+
+			tweeter.block("raj","alice");
+			tweeter.follow("alice","raj");
+
+			UUID msg6 = tweeter.tweet("raj", "Raj Fourth tweet hello world");
+			// should throw Exception
+//            UUID reply_msg6 = tweeter.reply("alice", msg6, "reply tweet3");
+			// should throw Exception - name cannot be null
+//            tweeter.block("","raj");
+
+			tweeter.like("divyaraj",msg3);
+			tweeter.like("dummy1",msg3);
+			tweeter.like("dummy",msg3);
+			tweeter.like("raj",reply_msg2);
+			// should throw exception
+//            tweeter.like("divyaraj",reply_msg2);
+
+			//should throw exception
+//            tweeter.like("raj", msg3);
+//            tweeter.like("dummy3",msg3);
 
 
 
